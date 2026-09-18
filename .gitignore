@@ -45,3 +45,5 @@ src/generated
 
 .uploads
 .env
+
+!.env.example
