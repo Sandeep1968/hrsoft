@@ -1,5 +1,7 @@
 # HRsoft
 
+**Live:** https://hrsoft-opal.vercel.app · **Repo:** https://github.com/Sandeep1968/hrsoft (private) · Vercel project `hrsoft` + Neon store `neon-sky-flame` (Mumbai).
+
 A production-grade HRMS for Indian companies — modelled on the Keka feature set —
 with role-based access control built into every layer.
 

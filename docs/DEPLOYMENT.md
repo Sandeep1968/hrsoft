@@ -1,5 +1,7 @@
 # Deploying HRsoft (Vercel + Neon)
 
+> **Current production:** https://hrsoft-opal.vercel.app (Vercel project `hrsoft`, region `bom1`, Neon marketplace store `neon-sky-flame`, GitHub `Sandeep1968/hrsoft` auto-deploys `main`). Google SSO, SMTP and S3 are **not** configured yet — see steps 2 and 3.
+
 ## 1. Database — Neon (PostgreSQL 16)
 
 1. Create a Neon project in **AWS ap-south-1 (Mumbai)**.
