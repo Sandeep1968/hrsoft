@@ -1,4 +1,4 @@
-import { getActor } from "@/lib/auth/session";
+import { requireActor } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { PageHeader, EmptyState } from "@/components/common";
 import { InboxList } from "./inbox-list";
@@ -6,7 +6,7 @@ import { InboxList } from "./inbox-list";
 export const metadata = { title: "Inbox" };
 
 export default async function InboxPage() {
-  const actor = (await getActor())!;
+  const actor = await requireActor();
   const items = await db.notification.findMany({ where: { userId: actor.userId }, orderBy: { createdAt: "desc" }, take: 100 });
   return (
     <div className="mx-auto max-w-3xl">

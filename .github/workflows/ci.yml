@@ -1,0 +1,38 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: hrsoft
+          POSTGRES_PASSWORD: hrsoft
+          POSTGRES_DB: hrsoft
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U hrsoft" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://hrsoft:hrsoft@localhost:5432/hrsoft?schema=public
+      DIRECT_URL: postgresql://hrsoft:hrsoft@localhost:5432/hrsoft?schema=public
+      SESSION_SECRET: ci-session-secret-ci-session-secret-1234
+      FIELD_ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      APP_URL: http://localhost:3000
+      SEED_EMPLOYEES: "200"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma migrate deploy
+      - run: npm run db:seed
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build

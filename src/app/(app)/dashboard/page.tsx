@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CalendarDays, Clock, Receipt, Users, Wallet, CheckSquare, Megaphone, Cake } from "lucide-react";
-import { getActor } from "@/lib/auth/session";
+import { requireActor } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { can, teamIds } from "@/lib/rbac/authorize";
 import { PageHeader, StatCard, StatusBadge } from "@/components/common";
@@ -11,7 +11,7 @@ import { fmtDate, todayUtc } from "@/lib/dates";
 export const metadata = { title: "Dashboard" };
 
 export default async function DashboardPage() {
-  const actor = (await getActor())!;
+  const actor = await requireActor();
   const today = todayUtc();
   const empId = actor.employeeId;
 

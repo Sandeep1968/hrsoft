@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * HRsoft seed — creates the organisation, system roles, lookup tables and
  * `SEED_EMPLOYEES` (default 2000) employees with users, salaries, leave
@@ -54,7 +53,7 @@ async function main() {
   console.log("roles seeded");
 
   // ── Organisation ───────────────────────────────────────────────────────
-  const org = (await db.organization.findFirst()) ?? (await db.organization.create({ data: { name: "Acme Technologies", legalName: "Acme Technologies Pvt Ltd", domain: "acme.example" } }));
+  if (!(await db.organization.findFirst())) await db.organization.create({ data: { name: "Acme Technologies", legalName: "Acme Technologies Pvt Ltd", domain: "acme.example" } });
   const entity =
     (await db.legalEntity.findFirst({ where: { isDefault: true } })) ??
     (await db.legalEntity.create({ data: { name: "Acme Technologies Pvt Ltd", pan: "AAACA1234A", tan: "HYDA12345B", gstin: "36AAACA1234A1Z5", ptState: "TS", isDefault: true, address: { line1: "Hitec City", city: "Hyderabad", state: "Telangana", pincode: "500081" } } }));
@@ -231,7 +230,7 @@ async function main() {
       await db.department.update({ where: { id: departments[i].id }, data: { headId: vp.id } });
       const mgrCount = Math.max(2, Math.round((COUNT / departments.length) / 9));
       for (let m = 0; m < mgrCount; m++) {
-        const mgr = await createEmployee({ email: faker.internet.email({ provider: "acme.example" }).toLowerCase().replace(/[^a-z0-9@._-]/g, "") + `.${seq}`, first: faker.person.firstName(), last: faker.person.lastName(), roles: ["MANAGER", "EMPLOYEE"], designation: faker.helpers.arrayElement(["Manager", "Senior Manager", "Lead"]), dept: i, managerId: vp.id });
+        const mgr = await createEmployee({ email: `mgr.${departments[i].code.toLowerCase()}.${seq}@acme.example`, first: faker.person.firstName(), last: faker.person.lastName(), roles: ["MANAGER", "EMPLOYEE"], designation: faker.helpers.arrayElement(["Manager", "Senior Manager", "Lead"]), dept: i, managerId: vp.id });
         managers.push(mgr.id);
       }
     }

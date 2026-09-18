@@ -20,8 +20,7 @@ export function proxy(req: NextRequest) {
   res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)");
 
   if (isPublic) {
-    if ((pathname === "/login") && hasSession) return NextResponse.redirect(new URL("/dashboard", req.url));
-    return res;
+    return res; // the login page itself redirects signed-in users after validating the session
   }
   if (pathname.startsWith("/api/")) {
     if (!hasSession && !hasApiKey) {

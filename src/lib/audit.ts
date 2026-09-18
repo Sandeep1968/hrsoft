@@ -18,7 +18,7 @@ export async function audit(
     const client = tx ?? db;
     await client.auditLog.create({
       data: {
-        actorId: actor && actor.roles[0] !== "SYSTEM" ? actor.userId : null,
+        actorId: actor && actor.roles?.[0] !== "SYSTEM" ? actor.userId : null,
         action,
         entityType,
         entityId: entityId ?? null,

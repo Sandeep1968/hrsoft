@@ -1,4 +1,15 @@
 export class AppError extends Error {
+  /**
+   * For 401/403/404 the digest matches Next.js's own HTTP access interrupts
+   * (`notFound()` / `forbidden()` / `unauthorized()`), so a service error
+   * thrown while rendering a page produces a real 404/403/401 response with
+   * the matching `not-found.tsx` / `forbidden.tsx` / `unauthorized.tsx`.
+   * Other statuses carry an `HRSOFT;<status>;<code>` digest that `error.tsx`
+   * reads (Next forwards digests to the client even when it redacts messages).
+   * API routes catch AppError before Next sees it, so JSON mapping is unaffected.
+   */
+  readonly digest: string;
+
   constructor(
     public readonly code: string,
     message: string,
@@ -7,7 +18,15 @@ export class AppError extends Error {
   ) {
     super(message);
     this.name = "AppError";
+    this.digest = status === 401 || status === 403 || status === 404 ? `NEXT_HTTP_ERROR_FALLBACK;${status}` : `HRSOFT;${status};${code}`;
   }
+}
+
+/** Parse a digest produced by AppError (used by error boundaries). */
+export function parseErrorDigest(digest?: string): { status: number; code: string } | null {
+  if (!digest?.startsWith("HRSOFT;")) return null;
+  const [, status, code] = digest.split(";");
+  return { status: Number(status), code };
 }
 
 export class UnauthorizedError extends AppError {

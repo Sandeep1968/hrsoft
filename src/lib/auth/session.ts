@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { randomToken, sha256 } from "@/lib/crypto";
 import { isProd } from "@/lib/env";
 import { type Actor, loadActor, restrictToScopes } from "@/lib/rbac/authorize";
+import { UnauthorizedError } from "@/lib/errors";
 
 export const SESSION_COOKIE = "hrsoft_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
@@ -94,6 +95,18 @@ export const getActor = cache(async (): Promise<Actor | null> => {
   }
   return null;
 });
+
+/**
+ * Actor for server components. Pages render in parallel with the layout, so a
+ * page must not assume the layout's redirect already ran; this throws an
+ * UnauthorizedError (rendered as `unauthorized.tsx`, HTTP 401) when the cookie
+ * is missing or stale.
+ */
+export async function requireActor(): Promise<Actor> {
+  const actor = await getActor();
+  if (!actor) throw new UnauthorizedError();
+  return actor;
+}
 
 /** Housekeeping: drop expired sessions (called from the daily cron). */
 export async function purgeExpiredSessions() {

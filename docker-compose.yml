@@ -1,0 +1,18 @@
+# Local infrastructure for development. The app itself runs with `npm run dev`.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hrsoft
+      POSTGRES_PASSWORD: hrsoft
+      POSTGRES_DB: hrsoft
+    ports:
+      - "5434:5432"
+    volumes:
+      - hrsoft_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hrsoft"]
+      interval: 5s
+      retries: 10
+volumes:
+  hrsoft_pg:

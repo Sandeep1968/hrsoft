@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const actor = await getActor();
-  if (!actor) redirect("/login");
+  if (!actor) redirect("/api/auth/logout?next=/login"); // clears a stale cookie, then goes to login
 
   const [user, hasReports, unread] = await Promise.all([
     db.user.findUnique({ where: { id: actor.userId }, select: { image: true, mustChangePassword: true, employee: { select: { employeeCode: true } } } }),

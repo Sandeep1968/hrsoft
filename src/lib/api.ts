@@ -53,6 +53,10 @@ export function errorResponse(e: unknown): Response {
     if (e.code === "P2025") return NextResponse.json({ error: { code: "NOT_FOUND", message: "Record not found" } }, { status: 404 });
     if (e.code === "P2003") return NextResponse.json({ error: { code: "CONFLICT", message: "Related record is missing or still referenced" } }, { status: 409 });
   }
+  // Malformed ids in URLs reach Postgres as invalid uuids — treat as not found rather than a server fault.
+  if (e instanceof Error && /invalid input syntax for type uuid/i.test(String((e as { cause?: unknown }).cause ?? e.message))) {
+    return NextResponse.json({ error: { code: "NOT_FOUND", message: "Record not found" } }, { status: 404 });
+  }
   console.error("Unhandled API error", e);
   return NextResponse.json({ error: { code: "INTERNAL", message: "Something went wrong" } }, { status: 500 });
 }
